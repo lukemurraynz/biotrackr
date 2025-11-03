@@ -23,6 +23,7 @@ The application follows a **microservices architecture** with separate services 
 - **Activity Service**: Processes and stores physical activity data from Fitbit
 - **Sleep Service**: Manages sleep tracking and analysis
 - **Weight Service**: Handles weight measurements and trends
+- **Food Service**: Tracks nutrition and food logging data from Fitbit
 - **Auth Service**: Manages authentication and authorization with Fitbit API
 
 Each service consists of:
@@ -35,6 +36,7 @@ Each service consists of:
 - 🏃 **Activity Tracking**: Comprehensive workout and activity data collection
 - 😴 **Sleep Analysis**: Sleep patterns, stages, and quality metrics
 - ⚖️ **Weight Management**: Weight tracking and trend visualization
+- 🍎 **Food Logging**: Nutrition tracking and food diary management
 - 🔐 **Secure Authentication**: OAuth integration with Fitbit
 - 📊 **Data Insights**: Analysis and reporting on health metrics
 - ☁️ **Cloud-Native**: Fully deployed on Azure with auto-scaling
@@ -122,6 +124,7 @@ For more detailed setup instructions, see the [Cosmos DB Emulator Setup Guide](d
 | **Sleep Service** | [![Deploy Sleep Service](https://github.com/willvelida/biotrackr/actions/workflows/deploy-sleep-service.yml/badge.svg)](https://github.com/willvelida/biotrackr/actions/workflows/deploy-sleep-service.yml) | ![Code Coverage](https://img.shields.io/badge/Code%20Coverage-100%25-brightgreen?style=flat) | ![Integration Tests](https://img.shields.io/badge/Tests-16%20Passing-brightgreen?style=flat) |
 | **Weight API** | [![Deploy Weight Api](https://github.com/willvelida/biotrackr/actions/workflows/deploy-weight-api.yml/badge.svg)](https://github.com/willvelida/biotrackr/actions/workflows/deploy-weight-api.yml) | ![Code Coverage](https://img.shields.io/badge/Code%20Coverage-75%25-yellow?style=flat) | ![Integration Tests](https://img.shields.io/badge/Tests-8%2F9%20Passing-success?style=flat) |
 | **Weight Service** | [![Deploy Weight Service](https://github.com/willvelida/biotrackr/actions/workflows/deploy-weight-service.yml/badge.svg)](https://github.com/willvelida/biotrackr/actions/workflows/deploy-weight-service.yml) | ![Code Coverage](https://img.shields.io/badge/Code%20Coverage-100%25-brightgreen?style=flat) | ![Integration Tests](https://img.shields.io/badge/Tests-4%20Passing-brightgreen?style=flat) |
+| **Food Service** | [![Deploy Food Service](https://github.com/willvelida/biotrackr/actions/workflows/deploy-food-service.yml/badge.svg)](https://github.com/willvelida/biotrackr/actions/workflows/deploy-food-service.yml) | ![Code Coverage](https://img.shields.io/badge/Code%20Coverage-100%25-brightgreen?style=flat) | ![Integration Tests](https://img.shields.io/badge/Tests-14%20Passing-brightgreen?style=flat) |
 
 ## 📚 Documentation
 
