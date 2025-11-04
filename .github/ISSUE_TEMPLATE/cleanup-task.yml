@@ -1,0 +1,157 @@
+---
+name: 🧹 Cleanup Task
+description: Report a code cleanup or technical debt opportunity
+title: "[Cleanup]: "
+labels: ["cleanup", "technical-debt"]
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for identifying a cleanup opportunity! This template helps document technical debt and maintainability improvements.
+
+  - type: dropdown
+    id: cleanup-category
+    attributes:
+      label: Cleanup Category
+      description: What type of cleanup is this?
+      options:
+        - Code Cleanup (unused code, dead code, messy structure)
+        - Duplication Removal (duplicate code, repeated patterns)
+        - Documentation (outdated docs, broken links, redundant comments)
+        - Refactoring (complex logic, outdated patterns)
+        - Dependencies (unused packages, outdated versions)
+        - Configuration (redundant config, inconsistent settings)
+        - Testing (redundant tests, outdated test patterns)
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: How important is this cleanup?
+      options:
+        - High (security, performance, broken functionality)
+        - Medium (significant duplication, confusing structure)
+        - Low (minor formatting, small refactors)
+    validations:
+      required: true
+
+  - type: dropdown
+    id: effort
+    attributes:
+      label: Estimated Effort
+      description: How much work will this take?
+      options:
+        - Small (< 1 hour)
+        - Medium (1-4 hours)
+        - Large (> 4 hours)
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Clearly explain what needs to be cleaned up and why
+      placeholder: |
+        Example: The Activity Service has multiple unused imports across several files, including System.Linq that's never used and outdated using statements for deprecated packages.
+    validations:
+      required: true
+
+  - type: textarea
+    id: location
+    attributes:
+      label: Location
+      description: List specific files, functions, or sections affected
+      placeholder: |
+        Example:
+        - src/Biotrackr.Activity.Svc/Services/ActivityService.cs (lines 5-8)
+        - src/Biotrackr.Activity.Svc/Program.cs (line 3)
+    validations:
+      required: true
+
+  - type: textarea
+    id: impact
+    attributes:
+      label: Impact
+      description: Describe how this cleanup will improve the codebase
+      placeholder: |
+        Example: Removing unused imports will:
+        - Reduce file size and improve compilation time
+        - Make the code easier to understand for new developers
+        - Eliminate confusion about which packages are actually used
+    validations:
+      required: true
+
+  - type: textarea
+    id: suggested-approach
+    attributes:
+      label: Suggested Approach
+      description: Provide step-by-step guidance for implementing the cleanup
+      placeholder: |
+        Example:
+        1. Run code analysis to identify all unused imports
+        2. Remove unused using statements from each file
+        3. Build the solution to ensure no compilation errors
+        4. Run existing unit and integration tests
+        5. Verify service still starts correctly
+    validations:
+      required: false
+
+  - type: textarea
+    id: testing-notes
+    attributes:
+      label: Testing Notes
+      description: Explain what tests should be run to verify the cleanup
+      placeholder: |
+        Example:
+        - Run all unit tests: dotnet test src/Biotrackr.Activity.Svc.UnitTests
+        - Run integration tests: dotnet test src/Biotrackr.Activity.Svc.IntegrationTests
+        - Verify service starts: dotnet run --project src/Biotrackr.Activity.Svc
+    validations:
+      required: false
+
+  - type: textarea
+    id: code-examples
+    attributes:
+      label: Code Examples
+      description: Include relevant code snippets showing the issue
+      render: csharp
+      placeholder: |
+        // Before cleanup:
+        using System;
+        using System.Linq;  // <- Not used
+        using System.Collections.Generic;
+        using Deprecated.Package;  // <- Outdated
+
+        public class ActivityService
+        {
+            // ... implementation
+        }
+    validations:
+      required: false
+
+  - type: textarea
+    id: related-issues
+    attributes:
+      label: Related Issues
+      description: Link to any related cleanup tasks or issues
+      placeholder: |
+        - Related to #123
+        - Part of cleanup epic #456
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional Context
+      description: Any other relevant information, screenshots, or references
+      placeholder: |
+        - References decision record: docs/decision-records/2025-10-28-service-lifetime-registration.md
+        - Similar cleanup was done in Weight Service: PR #789
+    validations:
+      required: false
