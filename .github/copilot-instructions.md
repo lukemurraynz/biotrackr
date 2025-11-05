@@ -14,8 +14,6 @@ Auto-generated from all feature plans. Last updated: 2025-11-03
 - Azure Cosmos DB (via Emulator in tests using mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator:latest) (007-sleep-svc-tests)
 - .NET 9.0 (C#) + xUnit 2.9.3, FluentAssertions 8.4.0, Moq 4.20.72, AutoFixture 4.18.1, coverlet.collector 6.0.4 (001-weight-api-tests)
 - C# / .NET 9.0 + xUnit 2.9.3, FluentAssertions 8.4.0, Moq 4.20.72, AutoFixture 4.18.1, coverlet.collector 6.0.4, Microsoft.AspNetCore.Mvc.Testing 9.0.0, Azure.Identity 1.14.1 (008-auth-svc-tests)
-- C# / .NET 9.0 + xUnit 2.9.3 (test framework), .NET build tools (010-remove-placeholder-test)
-- N/A (file deletion only) (010-remove-placeholder-test)
 
 ## Project Structure
 
@@ -34,7 +32,7 @@ tests/
 .NET 9.0 (C#): Follow standard conventions
 
 ## Recent Changes
-- 010-remove-placeholder-test: Added C# / .NET 9.0 + xUnit 2.9.3 (test framework), .NET build tools
+- 010-remove-placeholder-test: Removed placeholder test file from Activity.Svc.IntegrationTests (cleanup only, no new technologies added)
 - 009-food-svc-tests: Added C# / .NET 9.0 + xUnit 2.9.3, FluentAssertions 8.4.0, Moq 4.20.72, AutoFixture 4.18.1, coverlet.collector 6.0.4, Microsoft.AspNetCore.Mvc.Testing 9.0.0
 - 008-auth-svc-tests: Added complete test coverage (97.5%) with unit, contract, and E2E tests for Auth Service
 
