@@ -67,7 +67,6 @@ internal class Program
 
         services.AddScoped<ICosmosRepository, CosmosRepository>();
 
-        services.AddScoped<IFitbitService, FitbitService>();
         services.AddScoped<IActivityService, ActivityService>();
 
         services.AddHttpClient<IFitbitService, FitbitService>()
