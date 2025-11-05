@@ -44,7 +44,7 @@ You are a cleanup specialist focused on identifying opportunities to make codeba
 - **MUST use `mcp_github_issue_write` tool to create issues** - this is the only way to create GitHub issues
 - Issues will use the "🧹 Cleanup Task" template format from `.github/ISSUE_TEMPLATE/cleanup-task.yml`
 - Title must start with "[Cleanup]: " (the template will add this prefix)
-- Always add labels: ["cleanup", "technical-debt"] (matches template defaults)
+- Always add labels: ["cleanup", "technical-debt", "agent-generated", "cleanup-specialist"]
 - Format the issue body to match ALL template fields below
 
 **Issue Content Requirements (MUST match template fields exactly):**
@@ -100,7 +100,7 @@ Based on `.github/ISSUE_TEMPLATE/cleanup-task.yml`, include these sections in th
    - `repo: "biotrackr"`
    - `title: "[Cleanup]: <descriptive title>"`
    - `body: <formatted markdown with all details>`
-   - `labels: ["cleanup", "technical-debt"]`
+   - `labels: ["cleanup", "technical-debt", "agent-generated", "cleanup-specialist"]`
 6. **IMPORTANT: Create issues one at a time** - wait for each `mcp_github_issue_write` call to complete before making the next one. Do NOT create multiple issues in parallel.
 7. Provide a summary with links to all created issues
 
