@@ -58,12 +58,17 @@ Retrieve GitHub issues from biotrackr using the GitHub MCP server with support f
 5. **Handle pagination** when results exceed 100 issues (max per page)
 6. **Sort intelligently** based on user intent (recently updated, priority, creation date)
 7. **Provide context** about filters applied and total results count
+8. **For single-issue retrieval**: After displaying issue details, MUST ask the user if they want to assign themselves to the issue
+   - If user confirms assignment: Ask if they want to kick off the spec kit workflow
+   - Use GitHub MCP server to update issue assignment when confirmed
+   - Provide clear confirmation of assignment and next steps
 
 **Output Structure Requirements:**
 - Summary header with total count and filters applied
 - Markdown table with issue details
 - Analysis section with insights and patterns
 - Recommended actions when appropriate
+- Assignment prompt (for single-issue retrieval only)
 <!-- </important-core-instructions> -->
 
 ---
@@ -188,13 +193,14 @@ Your Actions:
 2. Include description, comments count, dates
 3. Show current state and assignee
 4. Provide context about labels and milestone
+5. Ask if user wants to assign themselves (if currently unassigned or reassignable)
 
 Expected Output:
 ## Issue #123: Implement activity tracking API
 
 **State:** open  
 **Labels:** `enhancement`, `p1`, `backend`  
-**Assignee:** @willvelida  
+**Assignee:** none  
 **Created:** 2025-10-15  
 **Updated:** 2025-10-28  
 
@@ -202,6 +208,10 @@ Expected Output:
 Implement REST API endpoints for activity tracking...
 
 **Comments:** 5 comments
+
+---
+
+Would you like to assign yourself to this issue?
 ```
 <!-- </example-get-single-issue> -->
 
@@ -325,6 +335,58 @@ These issues need triage and assignment:
 3. Assign documentation update to tech writer
 ```
 <!-- </example-unassigned-issues> -->
+
+<!-- <example-assign-issue-workflow> -->
+**Example 8: Issue assignment and spec kit workflow**
+
+User Request: "Tell me about issue #67"
+
+Your Actions:
+1. Retrieve full details for issue #67
+2. Display issue information
+3. Ask if user wants to assign themselves
+4. If yes, ask about spec kit workflow
+5. Update issue via GitHub MCP server
+6. Confirm actions taken
+
+Expected Interaction:
+
+**Initial Display:**
+## Issue #67: [Cleanup]: Refactor authentication middleware
+
+**State:** open  
+**Labels:** `cleanup`, `technical-debt`, `p2`  
+**Assignee:** none  
+**Created:** 2025-11-01  
+**Updated:** 2025-11-03  
+
+**Description:**
+The authentication middleware has duplicate code across three files...
+
+**Priority:** Medium  
+**Estimated Effort:** 2-4 hours
+
+---
+
+Would you like to assign yourself to this issue?
+
+**User Response:** "Yes"
+
+**Follow-up Question:**
+Great! Would you like to kick off the spec kit workflow for this issue?
+
+**User Response:** "Yes"
+
+**Confirmation:**
+✅ Successfully assigned issue #67 to @willvelida  
+✅ Spec kit workflow initiated for issue #67
+
+**Next Steps:**
+1. Spec kit workflow will create feature branch and planning artifacts
+2. Review generated spec files in `specs/067-refactor-auth-middleware/`
+3. Begin implementation following the generated plan
+```
+<!-- </example-assign-issue-workflow> -->
 
 ---
 

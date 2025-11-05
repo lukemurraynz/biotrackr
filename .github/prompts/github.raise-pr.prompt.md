@@ -1,6 +1,6 @@
 ---
 description: Automate pull request creation for Biotrackr using GitHub MCP server with PR template compliance
-tools: ['github']
+tools: ['github', 'run_in_terminal', 'read_file']
 ---
 
 # GitHub Pull Request Creation Prompt
@@ -62,25 +62,41 @@ Create GitHub pull requests programmatically with:
    - `repo`: "biotrackr"
    - `base`: "main" (default) or specify target branch
 
-3. **Analyze current state before creating PR:**
-   - Get current branch name (`git branch --show-current`)
-   - Extract type and optional issue number from branch name
-   - Get commit history since branching from main
-   - Identify changed files and their purposes
+3. **Execute Git commands using `run_in_terminal` tool:**
+   - MUST use PowerShell syntax (default shell: pwsh.exe)
+   - Get current branch: `git branch --show-current`
+   - Get commit history: `git log main..HEAD --oneline`
+   - Get changed files: `git diff --name-only main...HEAD`
+   - Check merge conflicts: `git diff --check main...HEAD`
+   - Handle command failures gracefully
 
-4. **Follow PR template structure exactly:**
+4. **Read files using `read_file` tool:**
+   - Read PR template: `.github/templates/pull-request-template.md`
+   - Read changed files to understand modifications
+   - Read commit standards: `docs/standards/commit-standards.md`
+   - Analyze file content for accurate change descriptions
+
+5. **Analyze current state before creating PR:**
+   - Execute Git commands to gather branch and commit info
+   - Extract type and optional issue number from branch name
+   - Read changed files to identify key modifications
+   - Identify functions/classes modified in each file
+
+6. **Follow PR template structure exactly:**
+   - Read template file to ensure compliance
    - Use emoji-based change categorization
    - Keep total description under 4000 characters (MANDATORY)
    - Include all template sections
    - Link related issues properly
 
-5. **Handle edge cases gracefully:**
-   - Warn if no commits exist on branch
-   - Detect merge conflicts before creating PR
+7. **Handle edge cases gracefully:**
+   - Warn if no commits exist on branch (check Git output)
+   - Detect merge conflicts before creating PR (git diff --check)
    - Validate base branch exists
    - Check if PR already exists for branch
+   - Handle Git command failures with clear error messages
 
-6. **Interactive workflow:**
+8. **Interactive workflow:**
    - Show PR preview before creation
    - Confirm with user before submitting
    - Provide PR URL after successful creation
@@ -163,19 +179,24 @@ branch="feat/gh-42-cosmos-integration"
 **Step-by-Step PR Creation Process:**
 
 ### 1. Pre-Creation Analysis
-```bash
-# Get current branch
+
+**Use `run_in_terminal` to execute Git commands:**
+
+```powershell
+# PowerShell (default shell)
 git branch --show-current
-
-# Get commits since main
 git log main..HEAD --oneline
-
-# Get changed files
 git diff --name-only main...HEAD
-
-# Check for conflicts
-git merge-base main HEAD
 git diff --check main...HEAD
+```
+
+**Example tool invocation:**
+```json
+{
+  "command": "git branch --show-current",
+  "explanation": "Get current branch name for PR head reference",
+  "isBackground": false
+}
 ```
 
 ### 2. Extract Branch Information
@@ -184,14 +205,26 @@ git diff --check main...HEAD
 - Extract human-readable slug
 
 ### 3. Analyze Changes
+
+**Use `read_file` to understand modifications:**
+- Read each changed file to identify specific changes
+- Extract function/class names that were modified
 - Group changed files by directory/component
-- Identify key functions/classes modified
 - Categorize changes by impact:
   - Core functionality
   - Tests
   - Documentation
   - Configuration
   - Infrastructure
+
+**Example tool invocation:**
+```json
+{
+  "filePath": "/path/to/changed/file.cs",
+  "limit": 100,
+  "offset": 1
+}
+```
 
 ### 4. Generate PR Body
 - **Description Section:** 2-3 sentences summarizing the PR
@@ -238,6 +271,80 @@ Examples:
 
 ---
 
+## Tool Usage
+
+<!-- <important-tool-usage> -->
+**Execute Git Commands:**
+
+Always use `run_in_terminal` for Git operations:
+
+```json
+// Get current branch
+{
+  "command": "git branch --show-current",
+  "explanation": "Get current branch name",
+  "isBackground": false
+}
+
+// Get commit history
+{
+  "command": "git log main..HEAD --oneline --format='%h %s'",
+  "explanation": "Get commits since branching from main",
+  "isBackground": false
+}
+
+// Get changed files
+{
+  "command": "git diff --name-only main...HEAD",
+  "explanation": "List all files changed in this branch",
+  "isBackground": false
+}
+
+// Check for merge conflicts
+{
+  "command": "git diff --check main...HEAD",
+  "explanation": "Detect potential merge conflicts",
+  "isBackground": false
+}
+```
+
+**Read Files:**
+
+Use `read_file` to analyze changed files and templates:
+
+```json
+// Read PR template
+{
+  "filePath": "c:\\Users\\velidawill\\Documents\\OpenSource\\biotrackr\\.github\\templates\\pull-request-template.md"
+}
+
+// Read changed file
+{
+  "filePath": "c:\\Users\\velidawill\\Documents\\OpenSource\\biotrackr\\src\\Biotrackr.Weight.Svc\\Services\\WeightService.cs",
+  "limit": 200,
+  "offset": 1
+}
+
+// Read commit standards
+{
+  "filePath": "c:\\Users\\velidawill\\Documents\\OpenSource\\biotrackr\\docs\\standards\\commit-standards.md"
+}
+```
+
+**Error Handling:**
+
+```powershell
+# Handle Git command failures
+$branch = git branch --show-current 2>&1
+if ($LASTEXITCODE -ne 0) {
+    Write-Error "Failed to get current branch: $branch"
+    exit 1
+}
+```
+<!-- </important-tool-usage> -->
+
+---
+
 ## Usage Examples
 
 <!-- <example-create-simple-pr> -->
@@ -246,11 +353,14 @@ Examples:
 User Request: "Create a pull request for my current changes"
 
 Your Actions:
-1. Get current branch: `feat/add-cleanup-specialist-agent`
-2. Analyze commits and changed files
-3. Extract branch info: type=`feat`, slug=`add-cleanup-specialist-agent`
-4. Generate PR body following template
-5. Call GitHub MCP server with PR details
+1. Execute `run_in_terminal`: `git branch --show-current` → `feat/add-cleanup-specialist-agent`
+2. Execute `run_in_terminal`: `git log main..HEAD --oneline` → Analyze commit messages
+3. Execute `run_in_terminal`: `git diff --name-only main...HEAD` → Get changed files
+4. Execute `read_file` for each changed file → Identify specific modifications
+5. Read PR template: `read_file` → `.github/templates/pull-request-template.md`
+6. Extract branch info: type=`feat`, slug=`add-cleanup-specialist-agent`
+7. Generate PR body following template
+8. Call GitHub MCP server with PR details
 
 Expected Output:
 ```markdown
