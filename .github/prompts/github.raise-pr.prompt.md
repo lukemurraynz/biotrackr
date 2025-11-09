@@ -1,6 +1,6 @@
 ---
 description: Automate pull request creation for Biotrackr using GitHub MCP server with PR template compliance
-tools: ['github', 'run_in_terminal', 'read_file']
+tools: ['search', 'runCommands', 'github/*']
 ---
 
 # GitHub Pull Request Creation Prompt
