@@ -492,6 +492,106 @@ internal class Program
 
 ---
 
+## GitHub Actions - Passing Secrets to Bicep Parameters
+
+### Issue: Secrets Cannot Be Passed Through Job Outputs or Workflow Inputs
+
+**Symptoms**:
+- Bicep parameter receives empty string instead of secret value
+- Double-slash in URLs due to missing tenant ID: `https://login.microsoftonline.com//v2.0/`
+- Deployment fails with validation errors about malformed URLs
+- Using `outputs: { tenantId: ${{ secrets.AZURE_TENANT_ID }} }` in job results in empty value
+
+**Root Cause**:
+GitHub Actions **secrets context is not available** in:
+1. Job outputs (`outputs:` block)
+2. Reusable workflow inputs (`with:` block)
+
+Secrets can only be accessed in:
+- `secrets:` block when calling reusable workflows
+- Direct step commands within the workflow
+
+**Solution**:
+Inject secrets into Bicep parameters within the **workflow template** using a preparation step:
+
+**Workflow Template Pattern** (`template-bicep-deploy.yml`, `template-bicep-validate.yml`, `template-bicep-whatif.yml`):
+
+```yaml
+on:
+  workflow_call:
+    inputs:
+      parameters:
+        required: false
+        type: string
+    secrets:
+      tenant-id:
+        required: true
+
+jobs:
+  deploy:
+    steps:
+      - uses: azure/login@v2
+        with:
+          tenant-id: ${{ secrets.tenant-id }}
+
+      - name: Prepare Parameters with Tenant ID
+        id: prepare-params
+        shell: bash
+        run: |
+          if [ -n "${{ inputs.parameters }}" ]; then
+            # Merge user parameters with tenantId
+            PARAMS=$(echo '${{ inputs.parameters }}' | jq -c '. + {"tenantId": "${{ secrets.tenant-id }}"}')
+          else
+            # Only tenantId
+            PARAMS='{"tenantId": "${{ secrets.tenant-id }}"}'
+          fi
+          echo "params=$PARAMS" >> "$GITHUB_OUTPUT"
+
+      - uses: azure/bicep-deploy@v2
+        with:
+          parameters: ${{ steps.prepare-params.outputs.params }}
+```
+
+**Calling Workflow** (API deployment workflows):
+
+```yaml
+validate:
+  uses: willvelida/biotrackr/.github/workflows/template-bicep-validate.yml@main
+  with:
+    template-file: './infra/apps/weight-api/main.bicep'
+    parameters-file: ./infra/apps/weight-api/main.dev.bicepparam
+    parameters: '{"imageName": "${{ needs.retrieve-container-image-dev.outputs.loginServer }}/biotrackr-weight-api:${{ github.sha }}"}'
+  secrets:
+    tenant-id: ${{ secrets.AZURE_TENANT_ID }}  # ✅ Correct - pass via secrets block
+```
+
+**❌ Wrong** (secrets in job outputs):
+```yaml
+retrieve-container-image-dev:
+  outputs:
+    tenantId: ${{ secrets.AZURE_TENANT_ID }}  # Empty string!
+```
+
+**❌ Wrong** (secrets in workflow inputs):
+```yaml
+validate:
+  with:
+    tenantId: ${{ secrets.AZURE_TENANT_ID }}  # Not allowed in 'with' block
+```
+
+**Resolution History**:
+- Fixed in workflow templates (commit c0f809d, 2025-11-12)
+- Removed tenantId from job outputs in all API workflows
+- Documented in `docs/decision-records/2025-11-12-apim-named-values-for-jwt-config.md`
+
+**Prevention**:
+- Always pass secrets through the `secrets:` block of reusable workflows
+- Use `jq` in workflow templates to merge secrets into parameters JSON
+- Never try to pass secrets through job outputs or workflow `with:` inputs
+- Test with actual secret values (not empty strings in .bicepparam files)
+
+---
+
 ## Notes
 
 - Keep this document updated as new patterns emerge

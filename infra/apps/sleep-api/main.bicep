@@ -28,6 +28,15 @@ param cosmosDbAccountName string
 @description('The name of the API Management instance that this Api uses')
 param apimName string
 
+@description('Enable JWT validation for managed identity authentication')
+param enableManagedIdentityAuth bool = true
+
+@description('Azure AD tenant ID for JWT issuer validation')
+param tenantId string
+
+@description('JWT audience to validate (uses default Azure Management API audience)')
+param jwtAudience string = environment().authentication.audiences[0]
+
 resource uai 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' existing = {
   name: uaiName
 }
@@ -101,6 +110,30 @@ resource sleepApimApi 'Microsoft.ApiManagement/service/apis@2024-06-01-preview' 
     ]
     serviceUrl: 'https://${sleepApi.outputs.fqdn}'
   }
+}
+
+module sleepApiNamedValues '../../modules/apim/apim-named-values.bicep' = {
+  name: 'sleep-api-named-values'
+  params: {
+    apimName: apim.name
+    tenantId: tenantId
+    jwtAudience: jwtAudience
+    enableManagedIdentityAuth: enableManagedIdentityAuth
+  }
+}
+
+resource sleepApiPolicy 'Microsoft.ApiManagement/service/apis/policies@2024-06-01-preview' = {
+  name: 'policy'
+  parent: sleepApimApi
+  properties: {
+    value: enableManagedIdentityAuth 
+      ? loadTextContent('policy-jwt-auth.xml')
+      : loadTextContent('policy-subscription-key.xml')
+    format: 'xml'
+  }
+  dependsOn: [
+    sleepApiNamedValues
+  ]
 }
 
 resource sleepApiGetAll 'Microsoft.ApiManagement/service/apis/operations@2024-06-01-preview' = {

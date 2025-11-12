@@ -28,6 +28,15 @@ param cosmosDbAccountName string
 @description('The name of the API Management instance that this Api uses')
 param apimName string
 
+@description('Enable JWT validation for managed identity authentication')
+param enableManagedIdentityAuth bool = true
+
+@description('Azure AD tenant ID for JWT issuer validation')
+param tenantId string
+
+@description('JWT audience to validate (uses default Azure Management API audience)')
+param jwtAudience string = environment().authentication.audiences[0]
+
 resource uai 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' existing = {
   name: uaiName
 }
@@ -94,13 +103,37 @@ resource activityApimApi 'Microsoft.ApiManagement/service/apis@2024-06-01-previe
   properties: {
     path: 'activity'
     displayName: 'Activity API'
-    description: 'Endpoints for Biotrack Activity API'
+    description: 'Endpoints for Biotrackr Activity API'
     subscriptionRequired: true
     protocols: [
       'https'
     ]
     serviceUrl: 'https://${activityApi.outputs.fqdn}'
   }
+}
+
+module activityApiNamedValues '../../modules/apim/apim-named-values.bicep' = {
+  name: 'activity-api-named-values'
+  params: {
+    apimName: apim.name
+    tenantId: tenantId
+    jwtAudience: jwtAudience
+    enableManagedIdentityAuth: enableManagedIdentityAuth
+  }
+}
+
+resource activityApiPolicy 'Microsoft.ApiManagement/service/apis/policies@2024-06-01-preview' = {
+  name: 'policy'
+  parent: activityApimApi
+  properties: {
+    value: enableManagedIdentityAuth 
+      ? loadTextContent('policy-jwt-auth.xml')
+      : loadTextContent('policy-subscription-key.xml')
+    format: 'xml'
+  }
+  dependsOn: [
+    activityApiNamedValues
+  ]
 }
 
 resource activityApiGetAll 'Microsoft.ApiManagement/service/apis/operations@2024-06-01-preview' = {
