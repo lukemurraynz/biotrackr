@@ -317,7 +317,7 @@ namespace Biotrackr.Food.Api.UnitTests.RepositoryTests
         }
 
         [Fact]
-        public async Task GetTotalFoodLogsCountAsync_ShouldReturnZero_WhenExceptionOccurs()
+        public async Task GetTotalFoodLogsCountAsync_ShouldPropagateException_WhenExceptionOccurs()
         {
             // Arrange
             _containerMock.Setup(x => x.GetItemQueryIterator<int>(
@@ -326,11 +326,10 @@ namespace Biotrackr.Food.Api.UnitTests.RepositoryTests
                 It.IsAny<QueryRequestOptions>()))
                 .Throws(new Exception("Test Exception"));
 
-            // Act
-            var result = await _repository.GetTotalFoodLogsCountAsync();
-
-            // Assert
-            result.Should().Be(0);
+            // Act & Assert
+            await _repository.Invoking(r => r.GetTotalFoodLogsCountAsync())
+                .Should().ThrowAsync<Exception>()
+                .WithMessage("Test Exception");
         }
 
         [Fact]
@@ -387,7 +386,7 @@ namespace Biotrackr.Food.Api.UnitTests.RepositoryTests
         }
 
         [Fact]
-        public async Task GetFoodLogsCountByDateRangeAsync_ShouldReturnZero_WhenExceptionOccurs()
+        public async Task GetFoodLogsCountByDateRangeAsync_ShouldPropagateException_WhenExceptionOccurs()
         {
             // Arrange
             var startDate = "2023-01-01";
@@ -399,11 +398,10 @@ namespace Biotrackr.Food.Api.UnitTests.RepositoryTests
                 It.IsAny<QueryRequestOptions>()))
                 .Throws(new Exception("Test Exception"));
 
-            // Act
-            var result = await _repository.GetFoodLogsCountByDateRangeAsync(startDate, endDate);
-
-            // Assert
-            result.Should().Be(0);
+            // Act & Assert
+            await _repository.Invoking(r => r.GetFoodLogsCountByDateRangeAsync(startDate, endDate))
+                .Should().ThrowAsync<Exception>()
+                .WithMessage("Test Exception");
         }
     }
 }
