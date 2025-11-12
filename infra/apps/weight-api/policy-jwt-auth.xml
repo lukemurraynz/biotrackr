@@ -4,12 +4,12 @@
     <choose>
       <when condition="@(context.Request.Headers.GetValueOrDefault(&quot;Authorization&quot;,&quot;&quot;).StartsWith(&quot;Bearer &quot;))">
         <validate-jwt header-name="Authorization" failed-validation-httpcode="401" failed-validation-error-message="Unauthorized: Invalid or missing JWT token">
-          <openid-config url="{{OPENID_CONFIG_URL}}" />
+          <openid-config url="{{openid-config-url}}" />
           <audiences>
-            <audience>{{JWT_AUDIENCE}}</audience>
+            <audience>{{jwt-audience}}</audience>
           </audiences>
           <issuers>
-            <issuer>{{JWT_ISSUER}}</issuer>
+            <issuer>{{jwt-issuer}}</issuer>
           </issuers>
         </validate-jwt>
       </when>

@@ -31,18 +31,11 @@ param apimName string
 @description('Enable JWT validation for managed identity authentication')
 param enableManagedIdentityAuth bool = true
 
-#disable-next-line no-unused-params // Used in policy XML string interpolation
 @description('Azure AD tenant ID for JWT issuer validation')
 param tenantId string
 
-#disable-next-line no-unused-params // Used in policy XML string interpolation  
 @description('JWT audience to validate (uses default Azure Management API audience)')
 param jwtAudience string = environment().authentication.audiences[0]
-
-#disable-next-line no-unused-vars // Used in policy XML string interpolation
-var openidConfigUrl = '${environment().authentication.loginEndpoint}${tenantId}/v2.0/.well-known/openid-configuration'
-#disable-next-line no-unused-vars // Used in policy XML string interpolation
-var jwtIssuer = '${environment().authentication.loginEndpoint}${tenantId}/'
 
 resource uai 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' existing = {
   name: uaiName
@@ -110,7 +103,7 @@ resource activityApimApi 'Microsoft.ApiManagement/service/apis@2024-06-01-previe
   properties: {
     path: 'activity'
     displayName: 'Activity API'
-    description: 'Endpoints for Biotrack Activity API'
+    description: 'Endpoints for Biotrackr Activity API'
     subscriptionRequired: true
     protocols: [
       'https'
@@ -119,15 +112,28 @@ resource activityApimApi 'Microsoft.ApiManagement/service/apis@2024-06-01-previe
   }
 }
 
+module activityApiNamedValues '../../modules/apim/apim-named-values.bicep' = {
+  name: 'activity-api-named-values'
+  params: {
+    apimName: apim.name
+    tenantId: tenantId
+    jwtAudience: jwtAudience
+    enableManagedIdentityAuth: enableManagedIdentityAuth
+  }
+}
+
 resource activityApiPolicy 'Microsoft.ApiManagement/service/apis/policies@2024-06-01-preview' = {
   name: 'policy'
   parent: activityApimApi
   properties: {
     value: enableManagedIdentityAuth 
-      ? replace(replace(replace(loadTextContent('policy-jwt-auth.xml'), '{{OPENID_CONFIG_URL}}', openidConfigUrl), '{{JWT_AUDIENCE}}', jwtAudience), '{{JWT_ISSUER}}', jwtIssuer)
+      ? loadTextContent('policy-jwt-auth.xml')
       : loadTextContent('policy-subscription-key.xml')
     format: 'xml'
   }
+  dependsOn: [
+    activityApiNamedValues
+  ]
 }
 
 resource activityApiGetAll 'Microsoft.ApiManagement/service/apis/operations@2024-06-01-preview' = {
