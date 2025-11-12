@@ -123,54 +123,9 @@ resource sleepApiPolicy 'Microsoft.ApiManagement/service/apis/policies@2024-06-0
   name: 'policy'
   parent: sleepApimApi
   properties: {
-    value: enableManagedIdentityAuth ? '''
-      <policies>
-        <inbound>
-          <base />
-          <choose>
-            <when condition="@(context.Request.Headers.GetValueOrDefault("Authorization","").StartsWith("Bearer "))">
-              <validate-jwt header-name="Authorization" failed-validation-httpcode="401" failed-validation-error-message="Unauthorized: Invalid or missing JWT token">
-                <openid-config url="${openidConfigUrl}" />
-                <audiences>
-                  <audience>${jwtAudience}</audience>
-                </audiences>
-                <issuers>
-                  <issuer>${jwtIssuer}</issuer>
-                </issuers>
-              </validate-jwt>
-            </when>
-            <otherwise>
-              <check-header name="Ocp-Apim-Subscription-Key" failed-check-httpcode="401" failed-check-error-message="Unauthorized: Missing or invalid subscription key" />
-            </otherwise>
-          </choose>
-        </inbound>
-        <backend>
-          <base />
-        </backend>
-        <outbound>
-          <base />
-        </outbound>
-        <on-error>
-          <base />
-        </on-error>
-      </policies>
-      ''' : '''
-      <policies>
-        <inbound>
-          <base />
-          <check-header name="Ocp-Apim-Subscription-Key" failed-check-httpcode="401" failed-check-error-message="Unauthorized: Missing or invalid subscription key" />
-        </inbound>
-        <backend>
-          <base />
-        </backend>
-        <outbound>
-          <base />
-        </outbound>
-        <on-error>
-          <base />
-        </on-error>
-      </policies>
-      '''
+    value: enableManagedIdentityAuth 
+      ? replace(replace(replace(loadTextContent('policy-jwt-auth.xml'), '{{OPENID_CONFIG_URL}}', openidConfigUrl), '{{JWT_AUDIENCE}}', jwtAudience), '{{JWT_ISSUER}}', jwtIssuer)
+      : loadTextContent('policy-subscription-key.xml')
     format: 'xml'
   }
 }
