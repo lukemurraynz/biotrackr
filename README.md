@@ -55,6 +55,7 @@ Each service consists of:
 - **Bicep**: Infrastructure as Code (IaC) for Azure resources
 - **GitHub Actions**: CI/CD pipelines and workflow automation
 - **Docker**: Containerization for consistent environments
+- **Azure API Management**: API gateway with JWT validation for secure managed identity authentication
 
 ### Testing
 - **xUnit**: Unit and integration testing framework
@@ -144,6 +145,7 @@ For more detailed setup instructions, see the [Cosmos DB Emulator Setup Guide](d
 - [.NET Configuration Format](docs/decision-records/2025-10-28-dotnet-configuration-format.md)
 - [Integration Test Project Structure](docs/decision-records/2025-10-28-integration-test-project-structure.md)
 - [Flaky Test Handling](docs/decision-records/2025-10-28-flaky-test-handling.md)
+- [APIM Managed Identity Authentication](docs/decision-records/2025-11-12-apim-managed-identity-auth.md)
 
 ## 📄 License
 

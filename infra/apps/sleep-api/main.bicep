@@ -28,6 +28,22 @@ param cosmosDbAccountName string
 @description('The name of the API Management instance that this Api uses')
 param apimName string
 
+@description('Enable JWT validation for managed identity authentication')
+param enableManagedIdentityAuth bool = true
+
+#disable-next-line no-unused-params // Used in policy XML string interpolation
+@description('Azure AD tenant ID for JWT issuer validation')
+param tenantId string
+
+#disable-next-line no-unused-params // Used in policy XML string interpolation  
+@description('JWT audience to validate (uses default Azure Management API audience)')
+param jwtAudience string = environment().authentication.audiences[0]
+
+#disable-next-line no-unused-vars // Used in policy XML string interpolation
+var openidConfigUrl = '${environment().authentication.loginEndpoint}${tenantId}/v2.0/.well-known/openid-configuration'
+#disable-next-line no-unused-vars // Used in policy XML string interpolation
+var jwtIssuer = '${environment().authentication.loginEndpoint}${tenantId}/'
+
 resource uai 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' existing = {
   name: uaiName
 }
@@ -100,6 +116,62 @@ resource sleepApimApi 'Microsoft.ApiManagement/service/apis@2024-06-01-preview' 
       'https'
     ]
     serviceUrl: 'https://${sleepApi.outputs.fqdn}'
+  }
+}
+
+resource sleepApiPolicy 'Microsoft.ApiManagement/service/apis/policies@2024-06-01-preview' = {
+  name: 'policy'
+  parent: sleepApimApi
+  properties: {
+    value: enableManagedIdentityAuth ? '''
+      <policies>
+        <inbound>
+          <base />
+          <choose>
+            <when condition="@(context.Request.Headers.GetValueOrDefault("Authorization","").StartsWith("Bearer "))">
+              <validate-jwt header-name="Authorization" failed-validation-httpcode="401" failed-validation-error-message="Unauthorized: Invalid or missing JWT token">
+                <openid-config url="${openidConfigUrl}" />
+                <audiences>
+                  <audience>${jwtAudience}</audience>
+                </audiences>
+                <issuers>
+                  <issuer>${jwtIssuer}</issuer>
+                </issuers>
+              </validate-jwt>
+            </when>
+            <otherwise>
+              <check-header name="Ocp-Apim-Subscription-Key" failed-check-httpcode="401" failed-check-error-message="Unauthorized: Missing or invalid subscription key" />
+            </otherwise>
+          </choose>
+        </inbound>
+        <backend>
+          <base />
+        </backend>
+        <outbound>
+          <base />
+        </outbound>
+        <on-error>
+          <base />
+        </on-error>
+      </policies>
+      ''' : '''
+      <policies>
+        <inbound>
+          <base />
+          <check-header name="Ocp-Apim-Subscription-Key" failed-check-httpcode="401" failed-check-error-message="Unauthorized: Missing or invalid subscription key" />
+        </inbound>
+        <backend>
+          <base />
+        </backend>
+        <outbound>
+          <base />
+        </outbound>
+        <on-error>
+          <base />
+        </on-error>
+      </policies>
+      '''
+    format: 'xml'
   }
 }
 
