@@ -54,7 +54,7 @@ public class FoodEndpointsTests : IAsyncLifetime
         {
             try
             {
-                await _container.DeleteItemAsync<FoodDocument>(id, new PartitionKey("FoodLog"));
+                await _container.DeleteItemAsync<FoodDocument>(id, new PartitionKey("Food"));
             }
             catch
             {
@@ -99,7 +99,7 @@ public class FoodEndpointsTests : IAsyncLifetime
             new FoodDocument
             {
                 Id = Guid.NewGuid().ToString(),
-                DocumentType = "FoodLog",
+                DocumentType = "Food",
                 Date = "2024-01-01",
                 Food = new FoodResponse
                 {
@@ -158,7 +158,7 @@ public class FoodEndpointsTests : IAsyncLifetime
             new FoodDocument
             {
                 Id = Guid.NewGuid().ToString(),
-                DocumentType = "FoodLog",
+                DocumentType = "Food",
                 Date = "2024-01-15",
                 Food = new FoodResponse
                 {
@@ -217,7 +217,7 @@ public class FoodEndpointsTests : IAsyncLifetime
             new FoodDocument
             {
                 Id = Guid.NewGuid().ToString(),
-                DocumentType = "FoodLog",
+                DocumentType = "Food",
                 Date = "2024-01-31",
                 Food = new FoodResponse
                 {

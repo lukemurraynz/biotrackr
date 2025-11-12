@@ -7,5 +7,5 @@ public class FoodDocument
     public string Id { get; set; } = string.Empty;
     public FoodResponse Food { get; set; } = new();
     public string Date { get; set; } = string.Empty;
-    public string DocumentType { get; set; } = "FoodLog";
+    public string DocumentType { get; set; } = "Food";
 }

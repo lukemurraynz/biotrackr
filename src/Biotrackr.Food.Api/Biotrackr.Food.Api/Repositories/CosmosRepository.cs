@@ -35,13 +35,13 @@ public class CosmosRepository : ICosmosRepository
 
             var queryDefinition = new QueryDefinition(
                 "SELECT * FROM c WHERE c.documentType = @documentType ORDER BY c.date DESC OFFSET @offset LIMIT @limit")
-                .WithParameter("@documentType", "FoodLog")
+                .WithParameter("@documentType", "Food")
                 .WithParameter("@offset", skip)
                 .WithParameter("@limit", pageSize);
 
             var queryRequestOptions = new QueryRequestOptions
             {
-                PartitionKey = new PartitionKey("FoodLog")
+                PartitionKey = new PartitionKey("Food")
             };
 
             var iterator = _container.GetItemQueryIterator<FoodDocument>(queryDefinition, requestOptions: queryRequestOptions);
@@ -71,12 +71,12 @@ public class CosmosRepository : ICosmosRepository
 
             var queryDefinition = new QueryDefinition(
                 "SELECT * FROM c WHERE c.documentType = @documentType AND c.date = @date")
-                .WithParameter("@documentType", "FoodLog")
+                .WithParameter("@documentType", "Food")
                 .WithParameter("@date", date);
 
             var queryRequestOptions = new QueryRequestOptions
             {
-                PartitionKey = new PartitionKey("FoodLog")
+                PartitionKey = new PartitionKey("Food")
             };
 
             var iterator = _container.GetItemQueryIterator<FoodDocument>(queryDefinition, requestOptions: queryRequestOptions);
@@ -108,7 +108,7 @@ public class CosmosRepository : ICosmosRepository
 
             var queryDefinition = new QueryDefinition(
                 "SELECT * FROM c WHERE c.documentType = @documentType AND c.date >= @startDate AND c.date <= @endDate ORDER BY c.date ASC OFFSET @offset LIMIT @limit")
-                .WithParameter("@documentType", "FoodLog")
+                .WithParameter("@documentType", "Food")
                 .WithParameter("@startDate", startDate)
                 .WithParameter("@endDate", endDate)
                 .WithParameter("@offset", skip)
@@ -116,7 +116,7 @@ public class CosmosRepository : ICosmosRepository
 
             var queryRequestOptions = new QueryRequestOptions
             {
-                PartitionKey = new PartitionKey("FoodLog")
+                PartitionKey = new PartitionKey("Food")
             };
 
             var iterator = _container.GetItemQueryIterator<FoodDocument>(queryDefinition, requestOptions: queryRequestOptions);
@@ -144,11 +144,11 @@ public class CosmosRepository : ICosmosRepository
         {
             var queryDefinition = new QueryDefinition(
                 "SELECT VALUE COUNT(1) FROM c WHERE c.documentType = @documentType")
-                .WithParameter("@documentType", "FoodLog");
+                .WithParameter("@documentType", "Food");
 
             var queryRequestOptions = new QueryRequestOptions
             {
-                PartitionKey = new PartitionKey("FoodLog")
+                PartitionKey = new PartitionKey("Food")
             };
 
             var iterator = _container.GetItemQueryIterator<int>(queryDefinition, requestOptions: queryRequestOptions);
@@ -174,13 +174,13 @@ public class CosmosRepository : ICosmosRepository
         {
             var queryDefinition = new QueryDefinition(
                 "SELECT VALUE COUNT(1) FROM c WHERE c.documentType = @documentType AND c.date >= @startDate AND c.date <= @endDate")
-                .WithParameter("@documentType", "FoodLog")
+                .WithParameter("@documentType", "Food")
                 .WithParameter("@startDate", startDate)
                 .WithParameter("@endDate", endDate);
 
             var queryRequestOptions = new QueryRequestOptions
             {
-                PartitionKey = new PartitionKey("FoodLog")
+                PartitionKey = new PartitionKey("Food")
             };
 
             var iterator = _container.GetItemQueryIterator<int>(queryDefinition, requestOptions: queryRequestOptions);
