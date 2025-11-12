@@ -140,63 +140,47 @@ public class CosmosRepository : ICosmosRepository
 
     public async Task<int> GetTotalFoodLogsCountAsync()
     {
-        try
+        var queryDefinition = new QueryDefinition(
+            "SELECT VALUE COUNT(1) FROM c WHERE c.documentType = @documentType")
+            .WithParameter("@documentType", "Food");
+
+        var queryRequestOptions = new QueryRequestOptions
         {
-            var queryDefinition = new QueryDefinition(
-                "SELECT VALUE COUNT(1) FROM c WHERE c.documentType = @documentType")
-                .WithParameter("@documentType", "Food");
+            PartitionKey = new PartitionKey("Food")
+        };
 
-            var queryRequestOptions = new QueryRequestOptions
-            {
-                PartitionKey = new PartitionKey("Food")
-            };
+        var iterator = _container.GetItemQueryIterator<int>(queryDefinition, requestOptions: queryRequestOptions);
 
-            var iterator = _container.GetItemQueryIterator<int>(queryDefinition, requestOptions: queryRequestOptions);
-
-            if (iterator.HasMoreResults)
-            {
-                var response = await iterator.ReadNextAsync();
-                return response.FirstOrDefault();
-            }
-
-            return 0;
-        }
-        catch (Exception ex)
+        if (iterator.HasMoreResults)
         {
-            _logger.LogError(ex, "Exception thrown in {MethodName}", nameof(GetTotalFoodLogsCountAsync));
-            return 0;
+            var response = await iterator.ReadNextAsync();
+            return response.FirstOrDefault();
         }
+
+        return 0;
     }
 
     public async Task<int> GetFoodLogsCountByDateRangeAsync(string startDate, string endDate)
     {
-        try
+        var queryDefinition = new QueryDefinition(
+            "SELECT VALUE COUNT(1) FROM c WHERE c.documentType = @documentType AND c.date >= @startDate AND c.date <= @endDate")
+            .WithParameter("@documentType", "Food")
+            .WithParameter("@startDate", startDate)
+            .WithParameter("@endDate", endDate);
+
+        var queryRequestOptions = new QueryRequestOptions
         {
-            var queryDefinition = new QueryDefinition(
-                "SELECT VALUE COUNT(1) FROM c WHERE c.documentType = @documentType AND c.date >= @startDate AND c.date <= @endDate")
-                .WithParameter("@documentType", "Food")
-                .WithParameter("@startDate", startDate)
-                .WithParameter("@endDate", endDate);
+            PartitionKey = new PartitionKey("Food")
+        };
 
-            var queryRequestOptions = new QueryRequestOptions
-            {
-                PartitionKey = new PartitionKey("Food")
-            };
+        var iterator = _container.GetItemQueryIterator<int>(queryDefinition, requestOptions: queryRequestOptions);
 
-            var iterator = _container.GetItemQueryIterator<int>(queryDefinition, requestOptions: queryRequestOptions);
-
-            if (iterator.HasMoreResults)
-            {
-                var response = await iterator.ReadNextAsync();
-                return response.FirstOrDefault();
-            }
-
-            return 0;
-        }
-        catch (Exception ex)
+        if (iterator.HasMoreResults)
         {
-            _logger.LogError(ex, "Exception thrown in {MethodName}", nameof(GetFoodLogsCountByDateRangeAsync));
-            return 0;
+            var response = await iterator.ReadNextAsync();
+            return response.FirstOrDefault();
         }
+
+        return 0;
     }
 }

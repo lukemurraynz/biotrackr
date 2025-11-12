@@ -56,9 +56,10 @@ public class FoodEndpointsTests : IAsyncLifetime
             {
                 await _container.DeleteItemAsync<FoodDocument>(id, new PartitionKey("Food"));
             }
-            catch
+            catch (Exception ex)
             {
-                // Ignore cleanup errors
+                // Log but don't fail test on cleanup errors
+                Console.WriteLine($"Failed to delete test document {id}: {ex.Message}");
             }
         }
     }
@@ -84,9 +85,10 @@ public class FoodEndpointsTests : IAsyncLifetime
                         item.id.ToString(),
                         new PartitionKey(item.documentType.ToString()));
                 }
-                catch
+                catch (Exception ex)
                 {
-                    // Ignore errors during cleanup
+                    // Log but don't fail on cleanup errors
+                    Console.WriteLine($"Failed to delete document {item.id}: {ex.Message}");
                 }
             }
         }

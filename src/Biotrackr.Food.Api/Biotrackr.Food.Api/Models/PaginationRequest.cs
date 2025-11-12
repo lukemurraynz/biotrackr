@@ -14,7 +14,7 @@ public class PaginationRequest
     public int PageSize
     {
         get => _pageSize;
-        set => _pageSize = value < 1 ? 20 : value > 100 ? 100 : value;
+        set => _pageSize = value < 1 ? 20 : Math.Clamp(value, 1, 100);
     }
 
     public int Skip => (PageNumber - 1) * PageSize;

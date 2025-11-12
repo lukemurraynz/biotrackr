@@ -83,7 +83,8 @@ namespace Biotrackr.Food.Api.UnitTests.EndpointHandlerTests
             // Assert
             result.Should().BeOfType<Ok<PaginationResponse<FoodDocument>>>();
             var okResult = result as Ok<PaginationResponse<FoodDocument>>;
-            okResult.Value.Items.Should().HaveCount(10);
+            okResult.Should().NotBeNull();
+            okResult!.Value.Items.Should().HaveCount(10);
             okResult.Value.PageNumber.Should().Be(2);
             okResult.Value.PageSize.Should().Be(10);
             okResult.Value.TotalCount.Should().Be(totalCount);
@@ -152,7 +153,8 @@ namespace Biotrackr.Food.Api.UnitTests.EndpointHandlerTests
             // Assert
             result.Result.Should().BeOfType<Ok<PaginationResponse<FoodDocument>>>();
             var okResult = result.Result as Ok<PaginationResponse<FoodDocument>>;
-            okResult.Value.Items.Should().HaveCount(5);
+            okResult.Should().NotBeNull();
+            okResult!.Value.Items.Should().HaveCount(5);
             okResult.Value.TotalCount.Should().Be(totalCount);
         }
 
@@ -247,7 +249,8 @@ namespace Biotrackr.Food.Api.UnitTests.EndpointHandlerTests
             // Assert
             result.Result.Should().BeOfType<Ok<PaginationResponse<FoodDocument>>>();
             var okResult = result.Result as Ok<PaginationResponse<FoodDocument>>;
-            okResult.Value.PageNumber.Should().Be(pageNumber);
+            okResult.Should().NotBeNull();
+            okResult!.Value.PageNumber.Should().Be(pageNumber);
             okResult.Value.PageSize.Should().Be(pageSize);
             _cosmosRepositoryMock.Verify(x => x.GetFoodLogsByDateRangeAsync(startDate, endDate, pageNumber, pageSize), Times.Once);
         }
