@@ -32,7 +32,7 @@ jobs:
     run-unit-tests:
           name: Run Unit Tests with Coverage
           needs: env-setup
-          uses: willvelida/biotrackr/.github/workflows/template-dotnet-run-unit-tests.yml@main
+          uses: willvelida/biotrackr/.github/workflows/template-dotnet-run-unit-tests.yml@013-apim-managed-identity
           with:
             dotnet-version: ${{ needs.env-setup.outputs.dotnet-version }}
             working-directory: ./src/Biotrackr.Weight.Api/Biotrackr.Weight.Api.UnitTests
@@ -42,7 +42,7 @@ jobs:
     run-contract-tests:
           name: Run API Contract Tests
           needs: env-setup
-          uses: willvelida/biotrackr/.github/workflows/template-dotnet-run-contract-tests.yml@main
+          uses: willvelida/biotrackr/.github/workflows/template-dotnet-run-contract-tests.yml@013-apim-managed-identity
           with:
             dotnet-version: ${{ needs.env-setup.outputs.dotnet-version }}
             working-directory: ./src/Biotrackr.Weight.Api/Biotrackr.Weight.Api.IntegrationTests
@@ -51,7 +51,7 @@ jobs:
     build-container-image-dev:
           name: Build and Push Container Image
           needs: [run-unit-tests, run-contract-tests]
-          uses: willvelida/biotrackr/.github/workflows/template-acr-push-image.yml@main
+          uses: willvelida/biotrackr/.github/workflows/template-acr-push-image.yml@013-apim-managed-identity
           with:
             working-directory: ./src/Biotrackr.Weight.Api
             app-name: biotrackr-weight-api
@@ -67,7 +67,6 @@ jobs:
         runs-on: ubuntu-latest
         outputs:
           loginServer: ${{ steps.get-acr-server.outputs.loginServer }}
-          tenantId: ${{ secrets.AZURE_TENANT_ID }}
         steps:
           - name: Azure login
             uses: azure/login@v2
@@ -85,18 +84,18 @@ jobs:
     lint:
         name: Run Bicep Linter
         needs: retrieve-container-image-dev
-        uses: willvelida/biotrackr/.github/workflows/template-bicep-linter.yml@main
+        uses: willvelida/biotrackr/.github/workflows/template-bicep-linter.yml@013-apim-managed-identity
         with:
             template-file: './infra/apps/weight-api/main.bicep'
 
     validate:
         name: Validate Template
         needs: [lint, retrieve-container-image-dev]
-        uses: willvelida/biotrackr/.github/workflows/template-bicep-validate.yml@main
+        uses: willvelida/biotrackr/.github/workflows/template-bicep-validate.yml@013-apim-managed-identity
         with:
           template-file: './infra/apps/weight-api/main.bicep'
           parameters-file: ./infra/apps/weight-api/main.dev.bicepparam 
-          parameters: '{"imageName": "${{ needs.retrieve-container-image-dev.outputs.loginServer }}/biotrackr-weight-api:${{ github.sha }}", "tenantId": "${{ needs.retrieve-container-image-dev.outputs.tenantId }}"}'
+          parameters: '{"imageName": "${{ needs.retrieve-container-image-dev.outputs.loginServer }}/biotrackr-weight-api:${{ github.sha }}"}'
           scope: resourceGroup
         secrets:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
@@ -107,11 +106,11 @@ jobs:
     preview:
         name: Preview Changes
         needs: [validate, retrieve-container-image-dev]
-        uses: willvelida/biotrackr/.github/workflows/template-bicep-whatif.yml@main
+        uses: willvelida/biotrackr/.github/workflows/template-bicep-whatif.yml@013-apim-managed-identity
         with:
           template-file: './infra/apps/weight-api/main.bicep'
           parameters-file: ./infra/apps/weight-api/main.dev.bicepparam
-          parameters: '{"imageName": "${{ needs.retrieve-container-image-dev.outputs.loginServer }}/biotrackr-weight-api:${{ github.sha }}", "tenantId": "${{ needs.retrieve-container-image-dev.outputs.tenantId }}"}'
+          parameters: '{"imageName": "${{ needs.retrieve-container-image-dev.outputs.loginServer }}/biotrackr-weight-api:${{ github.sha }}"}'
           scope: resourceGroup
         secrets:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
@@ -122,11 +121,11 @@ jobs:
     deploy-dev:
         name: Deploy Template to Dev
         needs: [preview, retrieve-container-image-dev]
-        uses: willvelida/biotrackr/.github/workflows/template-bicep-deploy.yml@main
+        uses: willvelida/biotrackr/.github/workflows/template-bicep-deploy.yml@013-apim-managed-identity
         with:
           template-file: './infra/apps/weight-api/main.bicep'
           parameters-file: ./infra/apps/weight-api/main.dev.bicepparam
-          parameters: '{"imageName": "${{ needs.retrieve-container-image-dev.outputs.loginServer }}/biotrackr-weight-api:${{ github.sha }}", "tenantId": "${{ needs.retrieve-container-image-dev.outputs.tenantId }}"}'
+          parameters: '{"imageName": "${{ needs.retrieve-container-image-dev.outputs.loginServer }}/biotrackr-weight-api:${{ github.sha }}"}'
           scope: resourceGroup
           environment: dev
         secrets:
@@ -138,7 +137,7 @@ jobs:
     run-e2e-tests:
         name: Run E2E Tests Against Dev
         needs: [deploy-dev, env-setup]
-        uses: willvelida/biotrackr/.github/workflows/template-dotnet-run-e2e-tests.yml@main
+        uses: willvelida/biotrackr/.github/workflows/template-dotnet-run-e2e-tests.yml@013-apim-managed-identity
         with:
           dotnet-version: ${{ needs.env-setup.outputs.dotnet-version }}
           working-directory: ./src/Biotrackr.Weight.Api/Biotrackr.Weight.Api.IntegrationTests

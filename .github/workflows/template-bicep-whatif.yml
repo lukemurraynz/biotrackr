@@ -40,6 +40,19 @@ jobs:
             tenant-id: ${{ secrets.tenant-id }}
             subscription-id: ${{ secrets.subscription-id }}
 
+        - name: Prepare Parameters with Tenant ID
+          id: prepare-params
+          shell: bash
+          run: |
+            if [ -n "${{ inputs.parameters }}" ]; then
+              # Merge user parameters with tenantId
+              PARAMS=$(echo '${{ inputs.parameters }}' | jq -c '. + {"tenantId": "${{ secrets.tenant-id }}"}')
+            else
+              # Only tenantId
+              PARAMS='{"tenantId": "${{ secrets.tenant-id }}"}'
+            fi
+            echo "params=$PARAMS" >> "$GITHUB_OUTPUT"
+
         - uses: azure/bicep-deploy@v2
           name: Perform What-If
           with:
@@ -52,4 +65,4 @@ jobs:
             name: ${{ github.run_number }}
             template-file: ${{ inputs.template-file }}
             parameters-file: ${{ inputs.parameters-file }}
-            parameters: ${{ inputs.parameters }}
+            parameters: ${{ steps.prepare-params.outputs.params }}
