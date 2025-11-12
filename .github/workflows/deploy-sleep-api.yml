@@ -83,6 +83,7 @@ jobs:
         runs-on: ubuntu-latest
         outputs:
           loginServer: ${{ steps.get-acr-server.outputs.loginServer }}
+          tenantId: ${{ secrets.AZURE_TENANT_ID }}
         steps:
           - name: Azure login
             uses: azure/login@v2
@@ -111,7 +112,7 @@ jobs:
         with:
           template-file: './infra/apps/sleep-api/main.bicep'
           parameters-file: ./infra/apps/sleep-api/main.dev.bicepparam
-          parameters: '{"imageName": "${{ needs.retrieve-container-image-dev.outputs.loginServer }}/biotrackr-sleep-api:${{ github.sha }}"}'
+          parameters: '{"imageName": "${{ needs.retrieve-container-image-dev.outputs.loginServer }}/biotrackr-sleep-api:${{ github.sha }}", "tenantId": "${{ needs.retrieve-container-image-dev.outputs.tenantId }}"}'
           scope: resourceGroup
         secrets:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
@@ -126,7 +127,7 @@ jobs:
         with:
           template-file: './infra/apps/sleep-api/main.bicep'
           parameters-file: ./infra/apps/sleep-api/main.dev.bicepparam
-          parameters: '{"imageName": "${{ needs.retrieve-container-image-dev.outputs.loginServer }}/biotrackr-sleep-api:${{ github.sha }}"}'
+          parameters: '{"imageName": "${{ needs.retrieve-container-image-dev.outputs.loginServer }}/biotrackr-sleep-api:${{ github.sha }}", "tenantId": "${{ needs.retrieve-container-image-dev.outputs.tenantId }}"}'
           scope: resourceGroup
         secrets:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
@@ -141,7 +142,7 @@ jobs:
         with:
           template-file: './infra/apps/sleep-api/main.bicep'
           parameters-file: ./infra/apps/sleep-api/main.dev.bicepparam
-          parameters: '{"imageName": "${{ needs.retrieve-container-image-dev.outputs.loginServer }}/biotrackr-sleep-api:${{ github.sha }}"}'
+          parameters: '{"imageName": "${{ needs.retrieve-container-image-dev.outputs.loginServer }}/biotrackr-sleep-api:${{ github.sha }}", "tenantId": "${{ needs.retrieve-container-image-dev.outputs.tenantId }}"}'
           scope: resourceGroup
           environment: dev
         secrets:

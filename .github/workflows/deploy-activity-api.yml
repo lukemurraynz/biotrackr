@@ -67,6 +67,7 @@ jobs:
         runs-on: ubuntu-latest
         outputs:
           loginServer: ${{ steps.get-acr-server.outputs.loginServer }}
+          tenantId: ${{ secrets.AZURE_TENANT_ID }}
         steps:
           - name: Azure login
             uses: azure/login@v2
@@ -111,7 +112,7 @@ jobs:
           scope: resourceGroup
           template-file: './infra/apps/activity-api/main.bicep'
           parameters-file: ./infra/apps/activity-api/main.dev.bicepparam
-          parameters: '{"imageName": "${{ needs.retrieve-container-image-dev.outputs.loginServer }}/biotrackr-activity-api:${{ github.sha }}"}'
+          parameters: '{"imageName": "${{ needs.retrieve-container-image-dev.outputs.loginServer }}/biotrackr-activity-api:${{ github.sha }}", "tenantId": "${{ needs.retrieve-container-image-dev.outputs.tenantId }}"}'
         secrets:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
@@ -125,7 +126,7 @@ jobs:
         with:
           template-file: './infra/apps/activity-api/main.bicep'
           parameters-file: ./infra/apps/activity-api/main.dev.bicepparam
-          parameters: '{"imageName": "${{ needs.retrieve-container-image-dev.outputs.loginServer }}/biotrackr-activity-api:${{ github.sha }}"}'
+          parameters: '{"imageName": "${{ needs.retrieve-container-image-dev.outputs.loginServer }}/biotrackr-activity-api:${{ github.sha }}", "tenantId": "${{ needs.retrieve-container-image-dev.outputs.tenantId }}"}'
           scope: resourceGroup
           environment: dev
         secrets:
